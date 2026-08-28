@@ -4,6 +4,7 @@ import com.jobdori.api.application.workspace.service.WorkspaceAccessValidationSe
 import com.jobdori.common.error.InvalidArgumentsException
 import com.jobdori.core.application.experience.ExperienceAiExtractionService
 import com.jobdori.core.application.ai.client.DocumentVisionClient
+import com.jobdori.core.application.experience.ExperienceDuplicateMergeService
 import com.jobdori.core.application.experience.ExperienceImportService
 import com.jobdori.core.application.experience.ExperienceStarExtractionResult
 import com.jobdori.core.application.experience.command.ImportedExperienceCommandGroup
@@ -43,6 +44,7 @@ internal class PdfExperienceImportServiceTest : StringSpec({
 
     val experienceImportService = mockk<ExperienceImportService>()
     val experienceAiExtractionService = mockk<ExperienceAiExtractionService>()
+    val experienceDuplicateMergeService = mockk<ExperienceDuplicateMergeService>()
     val workspaceAccessValidationService = mockk<WorkspaceAccessValidationService>()
     val pdfValidationService = mockk<PdfValidationService>()
     val profileReader = mockk<ProfileReader>()
@@ -54,6 +56,7 @@ internal class PdfExperienceImportServiceTest : StringSpec({
     val experienceTextImportService = ExperienceTextImportService(
         experienceImportService = experienceImportService,
         experienceAiExtractionService = experienceAiExtractionService,
+        experienceDuplicateMergeService = experienceDuplicateMergeService,
         profileReader = profileReader,
         profileModifier = profileModifier,
         experienceReader = experienceReader,
@@ -71,6 +74,7 @@ internal class PdfExperienceImportServiceTest : StringSpec({
         clearMocks(
             experienceImportService,
             experienceAiExtractionService,
+            experienceDuplicateMergeService,
             workspaceAccessValidationService,
             pdfValidationService,
             profileReader,
