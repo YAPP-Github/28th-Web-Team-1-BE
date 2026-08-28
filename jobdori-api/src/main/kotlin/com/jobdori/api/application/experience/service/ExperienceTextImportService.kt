@@ -2,6 +2,7 @@ package com.jobdori.api.application.experience.service
 
 import com.jobdori.common.logger.LoggerExtension.log
 import com.jobdori.core.application.experience.ExperienceAiExtractionService
+import com.jobdori.core.application.experience.ExperienceDuplicateMergeService
 import com.jobdori.core.application.experience.ExperienceImportService
 import com.jobdori.core.application.profile.ExperienceCoreCompetencyService
 import com.jobdori.core.domain.experience.error.ExperieneceEmptyImportedException
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service
 class ExperienceTextImportService(
     private val experienceImportService: ExperienceImportService,
     private val experienceAiExtractionService: ExperienceAiExtractionService,
+    private val experienceDuplicateMergeService: ExperienceDuplicateMergeService,
     private val profileReader: ProfileReader,
     private val profileModifier: ProfileModifier,
     private val experienceReader: ExperienceReader,
@@ -31,10 +33,17 @@ class ExperienceTextImportService(
             )
         }
 
-        experienceImportService.saveAll(
-            workspaceId = workspaceId,
-            groups = commands,
-        )
+        val plan = runCatching {
+            experienceDuplicateMergeService.plan(workspaceId, commands)
+        }.onFailure { e ->
+            log.warn(e) { "경험 중복 판정 실패, 중복 검사 없이 임포트 진행: workspaceId=$workspaceId" }
+        }.getOrNull()
+
+        if (plan == null) {
+            experienceImportService.saveAll(workspaceId = workspaceId, groups = commands)
+        } else {
+            experienceDuplicateMergeService.save(workspaceId, plan)
+        }
 
         val profile = profileReader.getOrCreateProfile(workspaceId)
         profileModifier.modify(profile, result.toProfileUpdateCommand(profileReader.getDetail(profile)))

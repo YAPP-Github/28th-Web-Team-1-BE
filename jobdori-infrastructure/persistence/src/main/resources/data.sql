@@ -551,3 +551,22 @@ VALUES (11, 11, 'DOCUMENT_TEXT_EXTRACTION',
 '너는 문서 OCR 도우미다. 이미지에서 보이는 내용만 정확히 전사하고 추측하거나 요약하지 않는다. 문서에 없는 사실을 추가하지 말고 읽을 수 없는 부분은 [읽을 수 없음]으로 표시한다.',
 null,
 null, now(), now());
+
+INSERT INTO ai_model_configs_v1 (id, ai_model_id, name, description, parameters, created_at, updated_at)
+VALUES
+  (12, 1, 'experience.project_duplicate_match', '임포트 프로젝트 중복 판정/병합', '{"temperature":0.0,"maxTokens":4096}' FORMAT JSON, now(), now()),
+  (13, 1, 'experience.duplicate_merge', '중복 경험 판정/병합', '{"temperature":0.2,"maxTokens":8192}' FORMAT JSON, now(), now());
+
+-- 12) 임포트 프로젝트 중복 판정 및 병합
+INSERT INTO prompts_v1 (id, ai_model_config_id, type, content, json_schema, deleted_at, created_at, updated_at)
+VALUES (12, 12, 'EXPERIENCE_PROJECT_DUPLICATE_MATCH',
+'당신은 이력서 프로젝트 중복 판정 및 병합 전문가다. 기존 프로젝트 목록과 새 프로젝트 목록을 비교한다. 이름 표기가 달라도 실제로 같은 프로젝트이면 같은 것으로 본다. 서로 다른 시기에 진행한 별도 프로젝트를 억지로 묶지 않는다. 확신이 없으면 matchedProjectId를 null로 반환한다. 오탐은 사용자 데이터 손실로 이어지므로 보수적으로 판정한다. 매칭된 경우 summary, role, period에는 두 프로젝트를 통합한 값을 반환한다. 두 내용 중 더 구체적인 사실과 수치를 살리고 중복 서술은 합치며 어느 한쪽에만 있는 정보도 버리지 않는다. 원문에 없는 사실, 수치, 기술, 기간을 지어내지 않는다. 매칭되지 않은 경우 병합 필드는 빈 문자열과 값이 모두 null인 period로 반환한다. 입력된 모든 새 프로젝트 index를 정확히 한 번씩 포함한다. 출력은 제공된 JSON 스키마를 100% 준수한다.',
+'{"type":"object","additionalProperties":false,"required":["items"],"properties":{"items":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["index","matchedProjectId","summary","role","period"],"properties":{"index":{"type":"integer","minimum":1},"matchedProjectId":{"type":["integer","null"]},"summary":{"type":"string","maxLength":500},"role":{"type":"string","maxLength":100},"period":{"type":"object","additionalProperties":false,"required":["startYear","startMonth","endYear","endMonth","isCurrent"],"properties":{"startYear":{"type":["integer","null"]},"startMonth":{"type":["integer","null"],"minimum":1,"maximum":12},"endYear":{"type":["integer","null"]},"endMonth":{"type":["integer","null"],"minimum":1,"maximum":12},"isCurrent":{"type":"boolean"}}}}}}}}',
+null, now(), now());
+
+-- 13) 중복 경험 판정 및 병합
+INSERT INTO prompts_v1 (id, ai_model_config_id, type, content, json_schema, deleted_at, created_at, updated_at)
+VALUES (13, 13, 'EXPERIENCE_DUPLICATE_MERGE',
+'당신은 이력서 경험 중복 판정 및 병합 전문가다. 같은 활동이나 성과를 서술한 경험이면 표현이 달라도 같은 경험으로 본다. 서로 다른 활동이면 매칭하지 않는다. 확신이 없으면 matchedExperienceId를 null로 반환한다. 매칭된 경우 title, tags, role, period, situation, task, action, result 전 필드를 두 경험의 통합본으로 재작성한다. 두 내용 중 더 구체적인 사실과 수치를 살리고 중복 서술은 합치며 어느 한쪽에만 있는 정보도 버리지 않는다. 원문에 없는 사실, 수치, 기술, 기간을 지어내지 않는다. 매칭되지 않은 경우 병합 문자열은 빈 문자열, tags는 빈 배열, period는 값이 모두 null인 객체로 반환한다. 입력된 모든 새 경험 index를 정확히 한 번씩 포함한다. 출력은 제공된 JSON 스키마를 100% 준수한다.',
+'{"type":"object","additionalProperties":false,"required":["items"],"properties":{"items":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["index","matchedExperienceId","title","tags","role","period","situation","task","action","result"],"properties":{"index":{"type":"integer","minimum":1},"matchedExperienceId":{"type":["integer","null"]},"title":{"type":"string","maxLength":150},"tags":{"type":"array","maxItems":10,"items":{"type":"string"}},"role":{"type":"string","maxLength":100},"period":{"type":"object","additionalProperties":false,"required":["startYear","startMonth","endYear","endMonth","isCurrent"],"properties":{"startYear":{"type":["integer","null"]},"startMonth":{"type":["integer","null"],"minimum":1,"maximum":12},"endYear":{"type":["integer","null"]},"endMonth":{"type":["integer","null"],"minimum":1,"maximum":12},"isCurrent":{"type":"boolean"}}},"situation":{"type":"string"},"task":{"type":"string"},"action":{"type":"string"},"result":{"type":"string"}}}}}}',
+null, now(), now());
