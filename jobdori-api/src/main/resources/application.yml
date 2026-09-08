@@ -12,6 +12,10 @@ server:
       enabled: true
       pattern: "%t %r %s %b %Dus"   # %D(처리시간)와 ai_call latencyMs의 간격으로 AI 외 병목을 본다. Tomcat 10+의 %D는 마이크로초
 
+jobdori:
+  admin:
+    token: ${JOBDORI_ADMIN_TOKEN:}
+
 spring:
   application:
     name: jobdori-api

@@ -4,8 +4,11 @@ import com.jobdori.core.domain.resume.ResumeStatus
 import com.jobdori.infrastructure.persistence.domain.resume.entity.ResumeEntity
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import java.time.LocalDateTime
 
 interface ResumeJpaRepository : JpaRepository<ResumeEntity, Long>, ResumeCustomRepository {
+
+    fun countByCreatedAtGreaterThanEqual(since: LocalDateTime): Long
 
     fun findByIdAndWorkspaceIdAndStatusIn(
         id: Long,

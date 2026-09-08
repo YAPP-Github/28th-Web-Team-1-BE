@@ -13,6 +13,8 @@ notion:
   api-version: ${NOTION_API_VERSION:2026-03-11}
 
 discord:
+  statistics:
+    webhook-url: ${DISCORD_STATISTICS_WEBHOOK_URL:}
   error-notification:
     enabled: ${DISCORD_ERROR_NOTIFICATION_ENABLED:false}
     webhook-url: ${DISCORD_ERROR_WEBHOOK_URL:}
