@@ -10,6 +10,8 @@ import java.time.LocalDateTime
 
 interface ExperienceJpaRepository : JpaRepository<ExperienceEntity, Long>, ExperienceCustomRepository {
 
+    fun countByCreatedAtGreaterThanEqual(since: LocalDateTime): Long
+
     fun findByIdAndWorkspaceIdAndStatus(
         id: Long,
         workspaceId: Long,
