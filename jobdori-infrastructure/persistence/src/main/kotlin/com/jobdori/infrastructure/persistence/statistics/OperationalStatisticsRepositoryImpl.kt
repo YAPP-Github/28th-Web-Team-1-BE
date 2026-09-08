@@ -9,7 +9,7 @@ import com.jobdori.infrastructure.persistence.domain.resume.repository.ResumeJpa
 import com.jobdori.infrastructure.persistence.domain.user.repository.UserJpaRepository
 import com.jobdori.infrastructure.persistence.domain.user.repository.WithdrawalUserJpaRepository
 import org.springframework.stereotype.Repository
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 @Repository
 class OperationalStatisticsRepositoryImpl(
@@ -21,30 +21,30 @@ class OperationalStatisticsRepositoryImpl(
     private val experienceRepository: ExperienceJpaRepository,
 ) : OperationalStatisticsRepository {
 
-    override fun get(since: LocalDateTime) = OperationalStatistics(
+    override fun get(since: LocalDate) = OperationalStatistics(
         users = OperationalStatistics.Count(
             total = userRepository.count(),
-            recent = userRepository.countByCreatedAtGreaterThanEqual(since),
+            recent = userRepository.countByCreatedAtGreaterThanEqual(since.atStartOfDay()),
         ),
         withdrawals = OperationalStatistics.Count(
             total = withdrawalUserRepository.count(),
-            recent = withdrawalUserRepository.countByCreatedAtGreaterThanEqual(since),
+            recent = withdrawalUserRepository.countByCreatedAtGreaterThanEqual(since.atStartOfDay()),
         ),
         jds = OperationalStatistics.Count(
             total = jdRepository.count(),
-            recent = jdRepository.countByCreatedAtGreaterThanEqual(since),
+            recent = jdRepository.countByCreatedAtGreaterThanEqual(since.atStartOfDay()),
         ),
         profiles = OperationalStatistics.Count(
             total = profileRepository.count(),
-            recent = profileRepository.countByCreatedAtGreaterThanEqual(since),
+            recent = profileRepository.countByCreatedAtGreaterThanEqual(since.atStartOfDay()),
         ),
         resumes = OperationalStatistics.Count(
             total = resumeRepository.count(),
-            recent = resumeRepository.countByCreatedAtGreaterThanEqual(since),
+            recent = resumeRepository.countByCreatedAtGreaterThanEqual(since.atStartOfDay()),
         ),
         experiences = OperationalStatistics.Count(
             total = experienceRepository.count(),
-            recent = experienceRepository.countByCreatedAtGreaterThanEqual(since),
+            recent = experienceRepository.countByCreatedAtGreaterThanEqual(since.atStartOfDay()),
         ),
     )
 
