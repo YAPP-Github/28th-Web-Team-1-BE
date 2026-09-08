@@ -7,6 +7,7 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import java.time.Duration
+import java.util.Locale
 
 @Component
 class DiscordOperationalStatisticsClientImpl(
@@ -32,26 +33,28 @@ class DiscordOperationalStatisticsClientImpl(
     }
 
     private fun OperationalStatistics.toDiscordContent() = """
-        📊 **Jobdori 주요 통계**
-        > 요청 시점 기준 최근 ${days}일
+        📊 **Scoop 주요 통계**
+        > 기준 일자: $until
 
-        👤 **현재 가입자**
-        전체 `${users.total}명` · 최근 ${days}일 `${users.recent}명`
+        👤 **가입자 (탈퇴 제외)**
+        전체 `${users.total.withThousandsSeparator()}명` · 최근 ${days}일 `${users.recent.withThousandsSeparator()}명`
 
-        👋 **탈퇴**
-        전체 `${withdrawals.total}명` · 최근 ${days}일 `${withdrawals.recent}명`
+        👋 **탈퇴자**
+        전체 `${withdrawals.total.withThousandsSeparator()}명` · 최근 ${days}일 `${withdrawals.recent.withThousandsSeparator()}명`
 
         🙋 **프로필**
-        전체 `${profiles.total}개` · 최근 ${days}일 `${profiles.recent}개`
+        전체 `${profiles.total.withThousandsSeparator()}개` · 최근 ${days}일 `${profiles.recent.withThousandsSeparator()}개`
 
         📋 **JD**
-        전체 `${jds.total}개` · 최근 ${days}일 `${jds.recent}개`
+        전체 `${jds.total.withThousandsSeparator()}개` · 최근 ${days}일 `${jds.recent.withThousandsSeparator()}개`
 
         💼 **경험**
-        전체 `${experiences.total}개` · 최근 ${days}일 `${experiences.recent}개`
+        전체 `${experiences.total.withThousandsSeparator()}개` · 최근 ${days}일 `${experiences.recent.withThousandsSeparator()}개`
 
         📄 **이력서**
-        전체 `${resumes.total}개` · 최근 ${days}일 `${resumes.recent}개`
+        전체 `${resumes.total.withThousandsSeparator()}개` · 최근 ${days}일 `${resumes.recent.withThousandsSeparator()}개`
     """.trimIndent()
+
+    private fun Long.withThousandsSeparator(): String = String.format(Locale.US, "%,d", this)
 
 }
